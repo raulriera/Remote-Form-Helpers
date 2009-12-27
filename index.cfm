@@ -5,14 +5,14 @@
 <h2>Instructions</h2>
 
 <ul>
-	<li>Instruction</li>
+	<li></li>
 </ul>
 
 <h2>Methods added</h2>
 
 <ul>
-	<li>startFormRemoteTag</li>
-	<li>endFormRemoteTag</li>
+	<li>startRemoteFormTag</li>
+	<li>endRemoteFormTag</li>
 </ul>
 
 <h2>Example</h2>
