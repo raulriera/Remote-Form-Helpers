@@ -49,11 +49,7 @@
 	
 	<cffunction name="endRemoteFormTag" returntype="string" access="public" output="false"
 		hint="Builds and returns a string containing the closing `form` tag.">
-		<cfscript>
-			if (StructKeyExists(request.wheels, "currentFormMethod"))
-				StructDelete(request.wheels, "currentFormMethod");
-		</cfscript>
-		<cfreturn "</form>">
+		<cfreturn endFormTag()>
 	</cffunction>
 	
 </cfcomponent>
