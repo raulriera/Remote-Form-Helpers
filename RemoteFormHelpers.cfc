@@ -52,4 +52,47 @@
 		<cfreturn endFormTag()>
 	</cffunction>
 	
+	<cffunction name="remoteLinkTo" returntype="string" access="public" output="false"
+		hint="Creates an AJAX link to another page in your application.">
+		<cfargument name="text" type="string" required="false" default="" hint="The text content of the link">
+		<cfargument name="confirm" type="string" required="false" default="" hint="Pass a message here to cause a JavaScript confirmation dialog box to pop up containing the message">
+		<cfargument name="route" type="string" required="false" default="" hint="See documentation for @URLFor">
+		<cfargument name="controller" type="string" required="false" default="" hint="See documentation for @URLFor">
+		<cfargument name="action" type="string" required="false" default="" hint="See documentation for @URLFor">
+		<cfargument name="key" type="any" required="false" default="" hint="See documentation for @URLFor">
+		<cfargument name="params" type="string" required="false" default="" hint="See documentation for @URLFor">
+		<cfargument name="anchor" type="string" required="false" default="" hint="See documentation for @URLFor">
+		<cfargument name="onlyPath" type="boolean" required="false" default="#application.wheels.functions.linkTo.onlyPath#" hint="See documentation for @URLFor">
+		<cfargument name="host" type="string" required="false" default="#application.wheels.functions.linkTo.host#" hint="See documentation for @URLFor">
+		<cfargument name="protocol" type="string" required="false" default="#application.wheels.functions.linkTo.protocol#" hint="See documentation for @URLFor">
+		<cfargument name="port" type="numeric" required="false" default="#application.wheels.functions.linkTo.port#" hint="See documentation for @URLFor">
+		<cfargument name="onSuccessCallback" type="string" required="false" default="onSubmitSuccess" hint="callback name when the ajax call success" />
+		<cfargument name="onErrorCallback" type="string" required="false" default="onSubmitError" hint="callback name when the ajax call fails" />
+		
+		<cfscript>
+			var loc = {};
+			$insertDefaults(name="linkTo", reserved="href", input=arguments);
+			
+			arguments.href = URLFor(argumentCollection=arguments);
+			arguments.href = Replace(arguments.href, "&", "&amp;", "all"); // make sure we return XHMTL compliant code
+			
+			// Setup the onClick attribute
+			arguments.onClick = "$.ajax({url: '#arguments.href#', success: function(data, textStatus){#arguments.onSuccessCallback#(data, textStatus);}, error: function(XMLHttpRequest, textStatus, errorThrown){#arguments.onErrorCallback#(XMLHttpRequest, textStatus, errorThrown);}}); return false;";
+			
+			if (Len(arguments.confirm)){
+				arguments.onClick = "if (!confirm('#arguments.confirm#')) { return false; };" & arguments.onClick;
+				/* arguments.onclick = $addToJavaScriptAttribute(name="onclick", content=loc.onclick, attributes=arguments); */
+			}
+			
+			if (!Len(arguments.text))
+				arguments.text = arguments.href;
+			loc.skip = "text,confirm,route,controller,action,key,params,anchor,onlyPath,host,protocol,port,onSuccessCallback,onErrorCallback";
+			if (Len(arguments.route))
+				loc.skip = ListAppend(loc.skip, $routeVariables(argumentCollection=arguments)); // variables passed in as route arguments should not be added to the html element
+						
+			loc.returnValue = $element(name="a", skip=loc.skip, content=arguments.text, attributes=arguments);
+		</cfscript>
+		<cfreturn loc.returnValue>
+	</cffunction>
+	
 </cfcomponent>
