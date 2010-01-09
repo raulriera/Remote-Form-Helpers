@@ -18,7 +18,7 @@
 		<cfargument name="host" type="string" required="false" default="#application.wheels.functions.startFormTag.host#" hint="See documentation for @URLFor">
 		<cfargument name="protocol" type="string" required="false" default="#application.wheels.functions.startFormTag.protocol#" hint="See documentation for @URLFor">
 		<cfargument name="port" type="numeric" required="false" default="#application.wheels.functions.startFormTag.port#" hint="See documentation for @URLFor">
-		<cfargument name="onSuccessCallback" type="string" required="false" default="onSubmitSuccess" hint="callback name when the ajax call success" />
+		<cfargument name="onSuccessCallback" type="string" required="false" default="onSubmitSuccess" hint="callback name when the ajax call succeeds" />
 		<cfargument name="onErrorCallback" type="string" required="false" default="onSubmitError" hint="callback name when the ajax call fails" />
 		<cfscript>
 			var loc = {};
@@ -66,7 +66,7 @@
 		<cfargument name="host" type="string" required="false" default="#application.wheels.functions.linkTo.host#" hint="See documentation for @URLFor">
 		<cfargument name="protocol" type="string" required="false" default="#application.wheels.functions.linkTo.protocol#" hint="See documentation for @URLFor">
 		<cfargument name="port" type="numeric" required="false" default="#application.wheels.functions.linkTo.port#" hint="See documentation for @URLFor">
-		<cfargument name="onSuccessCallback" type="string" required="false" default="onSubmitSuccess" hint="callback name when the ajax call success" />
+		<cfargument name="onSuccessCallback" type="string" required="false" default="onSubmitSuccess" hint="callback name when the ajax call succeeds" />
 		<cfargument name="onErrorCallback" type="string" required="false" default="onSubmitError" hint="callback name when the ajax call fails" />
 		
 		<cfscript>
