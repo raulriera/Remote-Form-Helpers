@@ -5,6 +5,13 @@
 		<cfreturn this>
 	</cffunction>
 	
+	<cffunction name="renderRemotePage" access="public" hint="Renders the specified remote view, it will append a '-js' value to the current action, or the value specified in the 'action' argument">
+		<cfargument name="action" type="string" default="#params.action#" />
+		
+		<!--- Render the page with no layout and with a suffix of "js" --->
+		<cfreturn renderPage(action="#arguments.action#-js", layout=false)>
+	</cffunction>
+	
 	<cffunction name="startRemoteFormTag" returntype="string" access="public" output="false"
 		hint="Builds and returns a string containing the opening form tag. The form's action will be built according to the same rules as `URLFor`.">
 		<cfargument name="method" type="string" required="false" default="#application.wheels.functions.startFormTag.method#" hint="The type of method to use in the form tag, `get` and `post` are the options">
@@ -18,8 +25,8 @@
 		<cfargument name="host" type="string" required="false" default="#application.wheels.functions.startFormTag.host#" hint="See documentation for @URLFor">
 		<cfargument name="protocol" type="string" required="false" default="#application.wheels.functions.startFormTag.protocol#" hint="See documentation for @URLFor">
 		<cfargument name="port" type="numeric" required="false" default="#application.wheels.functions.startFormTag.port#" hint="See documentation for @URLFor">
-		<cfargument name="onSuccessCallback" type="string" required="false" default="onSubmitSuccess" hint="callback name when the ajax call succeeds" />
-		<cfargument name="onErrorCallback" type="string" required="false" default="onSubmitError" hint="callback name when the ajax call fails" />
+		<cfargument name="onSuccessCallback" type="string" required="false" hint="callback name when the ajax call succeeds" />
+		<cfargument name="onErrorCallback" type="string" required="false" hint="callback name when the ajax call fails" />
 		<cfscript>
 			var loc = {};
 			$insertDefaults(name="startFormTag", input=arguments);
@@ -40,7 +47,7 @@
 				loc.skip = ListDeleteAt(loc.skip, ListFind(loc.skip, "action")); // need to re-add action here even if it was removed due to being a route variable above
 			
 			// setup the onSubmit attribute
-			arguments.onSubmit = "$.ajax({ type: '#arguments.method#', url: '#arguments.action#', success: function(data, textStatus){#arguments.onSuccessCallback#(data, textStatus);}, error: function(XMLHttpRequest, textStatus, errorThrown){#arguments.onErrorCallback#(XMLHttpRequest, textStatus, errorThrown);}, data: $(this).serialize()}); return false;";
+			arguments.onSubmit = $ajaxSetup(argumentCollection=arguments);
 			
 			loc.returnValue = $tag(name="form", skip=loc.skip, attributes=arguments);
 		</cfscript>
@@ -66,8 +73,8 @@
 		<cfargument name="host" type="string" required="false" default="#application.wheels.functions.linkTo.host#" hint="See documentation for @URLFor">
 		<cfargument name="protocol" type="string" required="false" default="#application.wheels.functions.linkTo.protocol#" hint="See documentation for @URLFor">
 		<cfargument name="port" type="numeric" required="false" default="#application.wheels.functions.linkTo.port#" hint="See documentation for @URLFor">
-		<cfargument name="onSuccessCallback" type="string" required="false" default="onSubmitSuccess" hint="callback name when the ajax call succeeds" />
-		<cfargument name="onErrorCallback" type="string" required="false" default="onSubmitError" hint="callback name when the ajax call fails" />
+		<cfargument name="onSuccessCallback" type="string" required="false" hint="callback name when the ajax call succeeds" />
+		<cfargument name="onErrorCallback" type="string" required="false" hint="callback name when the ajax call fails" />
 		
 		<cfscript>
 			var loc = {};
@@ -77,7 +84,7 @@
 			arguments.href = Replace(arguments.href, "&", "&amp;", "all"); // make sure we return XHMTL compliant code
 			
 			// Setup the onClick attribute
-			arguments.onClick = "$.ajax({url: '#arguments.href#', success: function(data, textStatus){#arguments.onSuccessCallback#(data, textStatus);}, error: function(XMLHttpRequest, textStatus, errorThrown){#arguments.onErrorCallback#(XMLHttpRequest, textStatus, errorThrown);}}); return false;";
+			arguments.onClick = $ajaxSetup(argumentCollection=arguments);
 			
 			if (Len(arguments.confirm)){
 				arguments.onClick = "if (!confirm('#arguments.confirm#')) { return false; };" & arguments.onClick;
@@ -93,6 +100,32 @@
 			loc.returnValue = $element(name="a", skip=loc.skip, content=arguments.text, attributes=arguments);
 		</cfscript>
 		<cfreturn loc.returnValue>
+	</cffunction>
+	
+	<cffunction name="$ajaxSetup" access="public" returnType="string" output="false">
+		
+		<cfset var loc.returnValue = {}>
+		
+		<!--- setup the .ajax method --->
+		<cfset loc.returnValue = "$.ajax({ type: '#arguments.method#', url: '#arguments.action#', data: $(this).serialize(), dataType: 'script'">
+		
+		<!--- add only the passed in callbacks --->
+		<cfif StructKeyExists(arguments, "onSuccessCallback")>
+			<cfset loc.returnValue = loc.returnValue & ", success: function(data, textStatus){#arguments.onSuccessCallback#(data, textStatus);}">
+		</cfif>
+		<cfif StructKeyExists(arguments, "onErrorCallback")>
+			<cfset loc.returnValue = loc.returnValue & ", error: function(XMLHttpRequest, textStatus, errorThrown){#arguments.onErrorCallback#(XMLHttpRequest, textStatus, errorThrown);}">
+		</cfif>
+		
+		
+		<!--- todo: add support for the following callbacks 
+		beforeSend
+		complete --->
+		
+		<!--- Close the line --->
+		<cfset loc.returnValue = loc.returnValue & "}); return false;">
+		
+		<cfreturn loc.returnValue />
 	</cffunction>
 	
 </cfcomponent>
