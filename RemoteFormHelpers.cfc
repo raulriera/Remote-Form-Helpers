@@ -1,7 +1,7 @@
 <cfcomponent output="false" mixin="controller">
 
 	<cffunction name="init">
-		<cfset this.version = "1.0">
+		<cfset this.version = "1.0.2,1.0.1,1.0">
 		<cfreturn this>
 	</cffunction>
 	
@@ -25,8 +25,11 @@
 		<cfargument name="host" type="string" required="false" default="#application.wheels.functions.startFormTag.host#" hint="See documentation for @URLFor">
 		<cfargument name="protocol" type="string" required="false" default="#application.wheels.functions.startFormTag.protocol#" hint="See documentation for @URLFor">
 		<cfargument name="port" type="numeric" required="false" default="#application.wheels.functions.startFormTag.port#" hint="See documentation for @URLFor">
-		<cfargument name="onSuccessCallback" type="string" required="false" hint="callback name when the ajax call succeeds" />
-		<cfargument name="onErrorCallback" type="string" required="false" hint="callback name when the ajax call fails" />
+		<cfargument name="onSuccess" type="string" required="false" hint="Function to execute when the ajax request succeeds" />
+		<cfargument name="onError" type="string" required="false" hint="Function to execute when the ajax request fails" />
+		<cfargument name="onComplete" type="string" required="false" hint="Function to execute when the ajax request is complete (runs on error and success)" />
+		<cfargument name="onBeforeSend" type="string" required="false" hint="Function to execute before the ajax request is sent." />
+		
 		<cfscript>
 			var loc = {};
 			$insertDefaults(name="startFormTag", input=arguments);
@@ -40,7 +43,7 @@
 			// make sure we return XHMTL compliant code
 			arguments.action = Replace(arguments.action, "&", "&amp;", "all");
 		
-			loc.skip = "route,controller,key,params,anchor,onlyPath,host,protocol,port,onSuccessCallback,onErrorCallback";
+			loc.skip = "route,controller,key,params,anchor,onlyPath,host,protocol,port,onSuccess,onError,onComplete,onBeforeSend";
 			if (Len(arguments.route))
 				loc.skip = ListAppend(loc.skip, $routeVariables(argumentCollection=arguments)); // variables passed in as route arguments should not be added to the html element
 			if (ListFind(loc.skip, "action"))
@@ -73,8 +76,10 @@
 		<cfargument name="host" type="string" required="false" default="#application.wheels.functions.linkTo.host#" hint="See documentation for @URLFor">
 		<cfargument name="protocol" type="string" required="false" default="#application.wheels.functions.linkTo.protocol#" hint="See documentation for @URLFor">
 		<cfargument name="port" type="numeric" required="false" default="#application.wheels.functions.linkTo.port#" hint="See documentation for @URLFor">
-		<cfargument name="onSuccessCallback" type="string" required="false" hint="callback name when the ajax call succeeds" />
-		<cfargument name="onErrorCallback" type="string" required="false" hint="callback name when the ajax call fails" />
+		<cfargument name="onSuccess" type="string" required="false" hint="Function to execute when the ajax request succeeds" />
+		<cfargument name="onError" type="string" required="false" hint="Function to execute when the ajax request fails" />
+		<cfargument name="onComplete" type="string" required="false" hint="Function to execute when the ajax request is complete (runs on error and success)" />
+		<cfargument name="onBeforeSend" type="string" required="false" hint="Function to execute before the ajax request is sent." />
 		
 		<cfscript>
 			var loc = {};
@@ -93,7 +98,7 @@
 			
 			if (!Len(arguments.text))
 				arguments.text = arguments.href;
-			loc.skip = "text,confirm,route,controller,action,key,params,anchor,onlyPath,host,protocol,port,onSuccessCallback,onErrorCallback";
+			loc.skip = "text,confirm,route,controller,action,key,params,anchor,onlyPath,host,protocol,port,onSuccess,onError,onComplete,onBeforeSend";
 			if (Len(arguments.route))
 				loc.skip = ListAppend(loc.skip, $routeVariables(argumentCollection=arguments)); // variables passed in as route arguments should not be added to the html element
 						
@@ -110,17 +115,18 @@
 		<cfset loc.returnValue = "$.ajax({ type: '#arguments.method#', url: '#arguments.action#', data: $(this).serialize(), dataType: 'script'">
 		
 		<!--- add only the passed in callbacks --->
-		<cfif StructKeyExists(arguments, "onSuccessCallback")>
-			<cfset loc.returnValue = loc.returnValue & ", success: function(data, textStatus){#arguments.onSuccessCallback#(data, textStatus);}">
+		<cfif StructKeyExists(arguments, "onSuccess")>
+			<cfset loc.returnValue = loc.returnValue & ", success: function(data, textStatus){#arguments.onSuccess#(data, textStatus);}">
 		</cfif>
-		<cfif StructKeyExists(arguments, "onErrorCallback")>
-			<cfset loc.returnValue = loc.returnValue & ", error: function(XMLHttpRequest, textStatus, errorThrown){#arguments.onErrorCallback#(XMLHttpRequest, textStatus, errorThrown);}">
+		<cfif StructKeyExists(arguments, "onError")>
+			<cfset loc.returnValue = loc.returnValue & ", error: function(XMLHttpRequest, textStatus, errorThrown){#arguments.onError#(XMLHttpRequest, textStatus, errorThrown);}">
 		</cfif>
-		
-		
-		<!--- todo: add support for the following callbacks 
-		beforeSend
-		complete --->
+		<cfif StructKeyExists(arguments, "onBeforeSend")>
+			<cfset loc.returnValue = loc.returnValue & ", beforeSend: function(XMLHttpRequest){#arguments.onBeforeSend#(XMLHttpRequest);}">
+		</cfif>
+		<cfif StructKeyExists(arguments, "onComplete")>
+			<cfset loc.returnValue = loc.returnValue & ", complete: function(XMLHttpRequest, textStatus){#arguments.onComplete#(XMLHttpRequest, textStatus);}">
+		</cfif>
 		
 		<!--- Close the line --->
 		<cfset loc.returnValue = loc.returnValue & "}); return false;">

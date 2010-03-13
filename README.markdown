@@ -8,3 +8,10 @@ This ColdFusion on Wheels plugin will enable Remote Form Helpers (jQuery) in you
 -	startRemoteFormTag
 -	endRemoteFormTag
 -	remoteLinkTo
+
+## Callbacks supported
+
+-	onSuccess
+-	onError
+-	onComplete
+-	onBeforeSend
