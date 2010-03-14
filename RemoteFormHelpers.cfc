@@ -5,16 +5,16 @@
 		<cfreturn this>
 	</cffunction>
 	
-	<cffunction name="renderRemotePage" access="public" hint="Renders the specified remote view, it will append a '-js' value to the current action, or the value specified in the 'action' argument">
+	<cffunction name="renderRemotePage" access="public" hint="Renders the specified remote view, it will append a '.js' value to the current action, or the value specified in the 'action' argument. So your filename should be [action].js.cfm">
 		<cfargument name="action" type="string" default="#params.action#" />
 		
 		<!--- Render the page with no layout and with a suffix of "js" --->
-		<cfreturn renderPage(action="#arguments.action#-js", layout=false)>
+		<cfreturn renderPage(action="#arguments.action#.js", layout=false)>
 	</cffunction>
 	
 	<cffunction name="startRemoteFormTag" returntype="string" access="public" output="false"
 		hint="Builds and returns a string containing the opening form tag. The form's action will be built according to the same rules as `URLFor`.">
-		<cfargument name="method" type="string" required="false" default="#application.wheels.functions.startFormTag.method#" hint="The type of method to use in the form tag, `get` and `post` are the options">
+		<!---<cfargument name="method" type="string" required="false" default="#application.wheels.functions.startFormTag.method#" hint="See documentation for @startFormTag">
 		<cfargument name="route" type="string" required="false" default="" hint="See documentation for @URLFor">
 		<cfargument name="controller" type="string" required="false" default="" hint="See documentation for @URLFor">
 		<cfargument name="action" type="string" required="false" default="" hint="See documentation for @URLFor">
@@ -24,7 +24,7 @@
 		<cfargument name="onlyPath" type="boolean" required="false" default="#application.wheels.functions.startFormTag.onlyPath#" hint="See documentation for @URLFor">
 		<cfargument name="host" type="string" required="false" default="#application.wheels.functions.startFormTag.host#" hint="See documentation for @URLFor">
 		<cfargument name="protocol" type="string" required="false" default="#application.wheels.functions.startFormTag.protocol#" hint="See documentation for @URLFor">
-		<cfargument name="port" type="numeric" required="false" default="#application.wheels.functions.startFormTag.port#" hint="See documentation for @URLFor">
+		<cfargument name="port" type="numeric" required="false" default="#application.wheels.functions.startFormTag.port#" hint="See documentation for @URLFor">--->
 		<cfargument name="onSuccess" type="string" required="false" hint="Function to execute when the ajax request succeeds" />
 		<cfargument name="onError" type="string" required="false" hint="Function to execute when the ajax request fails" />
 		<cfargument name="onComplete" type="string" required="false" hint="Function to execute when the ajax request is complete (runs on error and success)" />
@@ -64,8 +64,8 @@
 	
 	<cffunction name="remoteLinkTo" returntype="string" access="public" output="false"
 		hint="Creates an AJAX link to another page in your application.">
-		<cfargument name="text" type="string" required="false" default="" hint="The text content of the link">
-		<cfargument name="confirm" type="string" required="false" default="" hint="Pass a message here to cause a JavaScript confirmation dialog box to pop up containing the message">
+		<!---<cfargument name="text" type="string" required="false" default="" hint="See documentation for @linkTo">
+		<cfargument name="confirm" type="string" required="false" default="" hint="See documentation for @linkTo">
 		<cfargument name="route" type="string" required="false" default="" hint="See documentation for @URLFor">
 		<cfargument name="controller" type="string" required="false" default="" hint="See documentation for @URLFor">
 		<cfargument name="action" type="string" required="false" default="" hint="See documentation for @URLFor">
@@ -76,7 +76,7 @@
 		<cfargument name="host" type="string" required="false" default="#application.wheels.functions.linkTo.host#" hint="See documentation for @URLFor">
 		<cfargument name="protocol" type="string" required="false" default="#application.wheels.functions.linkTo.protocol#" hint="See documentation for @URLFor">
 		<cfargument name="port" type="numeric" required="false" default="#application.wheels.functions.linkTo.port#" hint="See documentation for @URLFor">
-		<cfargument name="onSuccess" type="string" required="false" hint="Function to execute when the ajax request succeeds" />
+		<cfargument name="onSuccess" type="string" required="false" hint="Function to execute when the ajax request succeeds" />--->
 		<cfargument name="onError" type="string" required="false" hint="Function to execute when the ajax request fails" />
 		<cfargument name="onComplete" type="string" required="false" hint="Function to execute when the ajax request is complete (runs on error and success)" />
 		<cfargument name="onBeforeSend" type="string" required="false" hint="Function to execute before the ajax request is sent." />
@@ -132,6 +132,128 @@
 		<cfset loc.returnValue = loc.returnValue & "}); return false;">
 		
 		<cfreturn loc.returnValue />
+	</cffunction>
+	
+	<!--- Overwrite to the $includeFile function, a simple remove of the SpanExcluding in the loc.fileName variable --->
+	<cffunction name="$includeFile" returntype="string" access="public" output="false">
+		<cfargument name="$name" type="any" required="true">
+		<cfargument name="$type" type="string" required="true">
+		<cfscript>
+			var loc = {};
+			loc.include = application.wheels.viewPath;
+			loc.fileName = Reverse(ListFirst(Reverse(arguments.$name), "/")) & ".cfm"; // extracts the file part of the path and replace ending ".cfm"
+			if (arguments.$type == "partial")
+				loc.fileName = Replace("_" & loc.fileName, "__", "_", "one"); // replaces leading "_" when the file is a partial
+			loc.folderName = Reverse(ListRest(Reverse(arguments.$name), "/"));
+			if (Left(arguments.$name, 1) == "/")
+				loc.include = loc.include & loc.folderName & "/" & loc.fileName; // Include a file in a sub folder to views
+			else if (arguments.$name Contains "/")
+				loc.include = loc.include & "/" & variables.params.controller & "/" & loc.folderName & "/" & loc.fileName; // Include a file in a sub folder of the current controller
+			else
+				loc.include = loc.include & "/" & variables.params.controller & "/" & loc.fileName; // Include a file in the current controller's view folder
+			arguments.$template = loc.include;
+			if (arguments.$type == "partial")
+			{
+				loc.pluralizedName = pluralize(arguments.$name);
+				if (StructKeyExists(arguments, loc.pluralizedName) && IsQuery(arguments[loc.pluralizedName]))
+				{
+					loc.query = arguments[loc.pluralizedName];
+					loc.returnValue = "";
+					loc.iEnd = loc.query.recordCount;
+					if (Len(arguments.$group))
+					{
+						// we want to group based on a column so loop through the rows until we find, this will break if the query is not ordered by the grouped column
+						loc.tempSpacer = "}|{";
+						loc.groupValue = "";
+						loc.groupQueryCount = 1;
+						arguments.group = QueryNew(loc.query.columnList);
+						if (application.wheels.showErrorInformation && !ListFindNoCase(loc.query.columnList, arguments.$group))
+							$throw(type="Wheels.GroupColumnNotFound", message="Wheels couldn't find a query column with the name of `#arguments.$group#`.", extendedInfo="Make sure your finder method has the column `#arguments.$group#` specified in the `select` argument. If the column does not exist, create it.");
+						for (loc.i=1; loc.i <= loc.iEnd; loc.i++)
+						{
+							if (loc.i == 1)
+							{
+								loc.groupValue = loc.query[arguments.$group][loc.i];
+							}
+							else if (loc.groupValue != loc.query[arguments.$group][loc.i])
+							{
+								// we have a different group for this row so output what we have
+								loc.returnValue = loc.returnValue & $includeAndReturnOutput(argumentCollection=arguments);
+								if (StructKeyExists(arguments, "$spacer"))
+									loc.returnValue = loc.returnValue & loc.tempSpacer;
+								loc.groupValue = loc.query[arguments.$group][loc.i];
+								arguments.group = QueryNew(loc.query.columnList);
+								loc.groupQueryCount = 1;
+							}
+							loc.dump = QueryAddRow(arguments.group);
+							loc.jEnd = ListLen(loc.query.columnList);
+							for (loc.j=1; loc.j <= loc.jEnd; loc.j++)
+							{
+								loc.property = ListGetAt(loc.query.columnList, loc.j);
+								arguments[loc.property] = loc.query[loc.property][loc.i];
+								loc.dump = QuerySetCell(arguments.group, loc.property, loc.query[loc.property][loc.i], loc.groupQueryCount);
+							}
+							arguments.current = (loc.i+1) - arguments.group.recordCount;
+							loc.groupQueryCount++;
+						}
+						// if we have anything left at the end we need to render it too
+						if (arguments.group.RecordCount > 0)
+						{
+							loc.returnValue = loc.returnValue & $includeAndReturnOutput(argumentCollection=arguments);
+							if (StructKeyExists(arguments, "$spacer") && loc.i < loc.iEnd)
+								loc.returnValue = loc.returnValue & loc.tempSpacer;
+						}
+						// now remove the last temp spacer and replace the tempSpacer with $spacer
+						if (Right(loc.returnValue, 3) == loc.tempSpacer)
+							loc.returnValue = Left(loc.returnValue, Len(loc.returnValue) - 3);
+						loc.returnValue = Replace(loc.returnValue, loc.tempSpacer, arguments.$spacer, "all");
+					}
+					else
+					{
+						for (loc.i=1; loc.i <= loc.iEnd; loc.i++)
+						{
+							arguments.current = loc.i;
+							loc.jEnd = ListLen(loc.query.columnList);
+							for (loc.j=1; loc.j <= loc.jEnd; loc.j++)
+							{
+								loc.property = ListGetAt(loc.query.columnList, loc.j);
+								arguments[loc.property] = loc.query[loc.property][loc.i];
+							}
+							loc.returnValue = loc.returnValue & $includeAndReturnOutput(argumentCollection=arguments);
+							if (StructKeyExists(arguments, "$spacer") && loc.i < loc.iEnd)
+								loc.returnValue = loc.returnValue & arguments.$spacer;
+						}
+					}
+				}
+				else if (StructKeyExists(arguments, arguments.$name) && IsObject(arguments[arguments.$name]))
+				{
+					loc.object = arguments[arguments.$name];
+					StructAppend(arguments, loc.object.properties(), false);
+				}
+				else if (StructKeyExists(arguments, loc.pluralizedName) && IsArray(arguments[loc.pluralizedName]))
+				{
+					loc.originalArguments = Duplicate(arguments);
+					loc.array = arguments[loc.pluralizedName];
+					loc.returnValue = "";
+					loc.iEnd = ArrayLen(loc.array);
+					for (loc.i=1; loc.i <= loc.iEnd; loc.i++)
+					{
+						arguments.current = loc.i;
+						loc.properties = loc.array[loc.i].properties();
+						for (loc.key in loc.originalArguments)
+							if (StructKeyExists(loc.properties, loc.key))
+								StructDelete(loc.properties, loc.key);
+						StructAppend(arguments, loc.properties, true);
+						loc.returnValue = loc.returnValue & $includeAndReturnOutput(argumentCollection=arguments);
+						if (StructKeyExists(arguments, "$spacer") && loc.i < loc.iEnd)
+							loc.returnValue = loc.returnValue & arguments.$spacer;
+					}
+				}
+			}
+			if (!StructKeyExists(loc, "returnValue"))
+				loc.returnValue = $includeAndReturnOutput(argumentCollection=arguments);
+		</cfscript>
+		<cfreturn loc.returnValue>
 	</cffunction>
 	
 </cfcomponent>
