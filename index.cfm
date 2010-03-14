@@ -5,42 +5,18 @@
 <h2>Methods added</h2>
 
 <ul>
+	<li>renderRemotePage</li>
 	<li>startRemoteFormTag</li>
 	<li>endRemoteFormTag</li>
 	<li>remoteLinkTo</li>
 </ul>
 
+<h2>Documentation</h2>
+
+<p>Coming soon</p>
+
 <h2>Example</h2>
 
-<p>Example code for your `new comment` view</p>
-
-<pre>#startRemoteFormTag(action="create")#
-	#textField(objectName="comment", property="name")#	
-	#textArea(objectName="comment", property="description")#
-		
-	#submitTag()#
-#endRemoteFormTag()#
-	
-&lt;script type="text/javascript"&gt;
-	function onSubmitSuccess(data, textStatus){
-		alert(data);
-	}		
-	function onSubmitError(XMLHttpRequest, textStatus, errorThrown){
-		alert(errorThrown);
-	}
-&lt;/script&gt;
-</pre>
-
-<p>Example code for your `create comment` action</p>
-
-<pre>
-&lt;cffunction name="create"&gt;
-	&lt;cfset comment = model("Comment").new(params.comment)&gt;
-	
-	&lt;cfset comment.save()&gt;
-	
-	&lt;cfset renderText(SerializeJSON(comment))&gt;
-&lt;/cffunction&gt;
-</pre>
+<p>Coming soon</p>
 
 <a href="<cfoutput>#cgi.http_referer#</cfoutput>"><<< Go Back</a>
