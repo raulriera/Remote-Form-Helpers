@@ -14,7 +14,7 @@
 	
 	<cffunction name="startRemoteFormTag" returntype="string" access="public" output="false"
 		hint="Builds and returns a string containing the opening form tag. The form's action will be built according to the same rules as `URLFor`.">
-		<!---<cfargument name="method" type="string" required="false" default="#application.wheels.functions.startFormTag.method#" hint="See documentation for @startFormTag">
+		<cfargument name="method" type="string" required="false" default="#application.wheels.functions.startFormTag.method#" hint="See documentation for @startFormTag">
 		<cfargument name="route" type="string" required="false" default="" hint="See documentation for @URLFor">
 		<cfargument name="controller" type="string" required="false" default="" hint="See documentation for @URLFor">
 		<cfargument name="action" type="string" required="false" default="" hint="See documentation for @URLFor">
@@ -24,7 +24,7 @@
 		<cfargument name="onlyPath" type="boolean" required="false" default="#application.wheels.functions.startFormTag.onlyPath#" hint="See documentation for @URLFor">
 		<cfargument name="host" type="string" required="false" default="#application.wheels.functions.startFormTag.host#" hint="See documentation for @URLFor">
 		<cfargument name="protocol" type="string" required="false" default="#application.wheels.functions.startFormTag.protocol#" hint="See documentation for @URLFor">
-		<cfargument name="port" type="numeric" required="false" default="#application.wheels.functions.startFormTag.port#" hint="See documentation for @URLFor">--->
+		<cfargument name="port" type="numeric" required="false" default="#application.wheels.functions.startFormTag.port#" hint="See documentation for @URLFor">
 		<cfargument name="onSuccess" type="string" required="false" hint="Function to execute when the ajax request succeeds" />
 		<cfargument name="onError" type="string" required="false" hint="Function to execute when the ajax request fails" />
 		<cfargument name="onComplete" type="string" required="false" hint="Function to execute when the ajax request is complete (runs on error and success)" />
@@ -64,7 +64,7 @@
 	
 	<cffunction name="remoteLinkTo" returntype="string" access="public" output="false"
 		hint="Creates an AJAX link to another page in your application.">
-		<!---<cfargument name="text" type="string" required="false" default="" hint="See documentation for @linkTo">
+		<cfargument name="text" type="string" required="false" default="" hint="See documentation for @linkTo">
 		<cfargument name="confirm" type="string" required="false" default="" hint="See documentation for @linkTo">
 		<cfargument name="route" type="string" required="false" default="" hint="See documentation for @URLFor">
 		<cfargument name="controller" type="string" required="false" default="" hint="See documentation for @URLFor">
@@ -76,7 +76,7 @@
 		<cfargument name="host" type="string" required="false" default="#application.wheels.functions.linkTo.host#" hint="See documentation for @URLFor">
 		<cfargument name="protocol" type="string" required="false" default="#application.wheels.functions.linkTo.protocol#" hint="See documentation for @URLFor">
 		<cfargument name="port" type="numeric" required="false" default="#application.wheels.functions.linkTo.port#" hint="See documentation for @URLFor">
-		<cfargument name="onSuccess" type="string" required="false" hint="Function to execute when the ajax request succeeds" />--->
+		<cfargument name="onSuccess" type="string" required="false" hint="Function to execute when the ajax request succeeds" />
 		<cfargument name="onError" type="string" required="false" hint="Function to execute when the ajax request fails" />
 		<cfargument name="onComplete" type="string" required="false" hint="Function to execute when the ajax request is complete (runs on error and success)" />
 		<cfargument name="onBeforeSend" type="string" required="false" hint="Function to execute before the ajax request is sent." />
@@ -109,10 +109,17 @@
 	
 	<cffunction name="$ajaxSetup" access="public" returnType="string" output="false">
 		
-		<cfset var loc.returnValue = {}>
+		<cfset var loc = {}>
 		
 		<!--- setup the .ajax method --->
-		<cfset loc.returnValue = "$.ajax({ type: '#arguments.method#', url: '#arguments.action#', data: $(this).serialize(), dataType: 'script'">
+		<cfset loc.returnValue = "$.ajax({ dataType: 'script'">
+		
+		<!--- If this is a form, use the serialize method for the data and the action argument --->
+		<cfif NOT StructKeyExists(arguments, "href")>
+			<cfset loc.returnValue = loc.returnValue & ", type: '#arguments.method#', url: '#arguments.action#', data: $(this).serialize()">
+		<cfelse>
+			<cfset loc.returnValue = loc.returnValue & ", url: '#arguments.href#'">
+		</cfif>
 		
 		<!--- add only the passed in callbacks --->
 		<cfif StructKeyExists(arguments, "onSuccess")>

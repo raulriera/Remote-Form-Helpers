@@ -7,7 +7,6 @@
 	- Made all callbacks optional.
 	- Removed the suffix "Callback" from all callbacks.
 	- Support for `complete` and `beforeSend` callback.
-	- Commented out all non new arguments for the `startRemoteFormTag` and `linkRemoteTo` functions (for easier reading).
 	- Code cleanup.
 
 - Version 0.2:
