@@ -2,6 +2,7 @@
 - Version 0.3:
 	- Support for Wheels 1.0.2.
 	- Support for `renderRemotePage`.
+	- Support for wrapper functions to insert HTML, replace HTML, remove element, show element and hide element (pageInsertHTML, pageReplaceHTML, pageRemove, pageShow, pageHide)
 	- Filename convention for remote views is `actionName.js.cfm`
 	- Overall change on how the requests are handled. Now jQuery will parse the data sent from the controller (using the renderRemotePage)
 	- Made all callbacks optional.

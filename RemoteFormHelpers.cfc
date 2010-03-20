@@ -5,6 +5,90 @@
 		<cfreturn this>
 	</cffunction>
 	
+	<cffunction name="pageInsertHTML" access="public" hint="Inserts HTML content at the specified position and HTML element">
+		<cfargument name="selector" type="string" required="true" hint="The class or ID of the content you wish to insert HTML into" />
+		<cfargument name="position" type="string" required="false" default="before" hint="Position to insert the content into" />
+		<cfargument name="content" type="string" required="false" hint="HTML to insert into" />
+		<cfargument name="partial" type="string" required="false" hint="Partial file containing the HTML you wish to insert to" />
+		
+		<cfset var loc = {}>
+		
+		<cfswitch expression="#arguments.position#">
+			<cfcase value="before">
+				<cfset arguments.position = "prepend">
+			</cfcase>
+			<cfcase value="after">
+				<cfset arguments.position = "append">
+			</cfcase>
+			<cfdefaultcase>
+				<!--- Throw informative Wheels error --->
+			</cfdefaultcase>
+		</cfswitch>
+		
+		<cfif StructKeyExists(arguments, "content")>
+			<cfset loc.HTMLContent = JSStringFormat(arguments.content)>
+		<cfelseif StructKeyExists(arguments, "partial")>
+			<cfset loc.HTMLContent = JSStringFormat(includePartial(arguments.partial))>
+		<cfelse>
+			<!--- Throw informative Wheels error --->
+		</cfif>
+		
+		<cfset loc.resultHTML = "$('#arguments.selector#').#arguments.position#('#loc.HTMLContent#');">
+		
+		<cfreturn loc.resultHTML />
+	</cffunction>
+	
+	<cffunction name="pageReplaceHTML" access="public" hint="Replace the HTML content of the specified element">
+		<cfargument name="selector" type="string" required="true" hint="The class or ID of the content you wish to insert HTML into" />
+		<cfargument name="content" type="string" required="false" hint="HTML to replace with" />
+		<cfargument name="partial" type="string" required="false" hint="Partial file containing the HTML you wish to replace with" />
+		
+		<cfset var loc = {}>
+		
+		<cfif StructKeyExists(arguments, "content")>
+			<cfset loc.HTMLContent = JSStringFormat(arguments.content)>
+		<cfelseif StructKeyExists(arguments, "partial")>
+			<cfset loc.HTMLContent = JSStringFormat(includePartial(arguments.partial))>
+		<cfelse>
+			<!--- Throw informative Wheels error --->
+		</cfif>
+		
+		<cfset loc.resultHTML = "$('#arguments.selector#').html('#loc.HTMLContent#');">
+		
+		<cfreturn loc.resultHTML />
+	</cffunction>
+	
+	<cffunction name="pageRemove" access="public" hint="Removes the specified element">
+		<cfargument name="selector" type="string" required="true" hint="The class or ID of the content you wish to insert HTML into" />
+		<!---<cfargument name="options" type="string" required="false" hint="jQuery specific options to the apply to the remove function" />--->
+		
+		<cfset var loc = {}>
+		
+		<cfset loc.resultHTML = "$('#arguments.selector#').remove();">
+		
+		<cfreturn loc.resultHTML />
+	</cffunction>
+	
+	<cffunction name="pageHide" access="public" hint="Hides the specified element">
+		<cfargument name="selector" type="string" required="true" hint="The class or ID of the content you wish to hide" />
+		
+		<cfset var loc = {}>
+		
+		<cfset loc.resultHTML = "$('#arguments.selector#').hide();">
+		
+		<cfreturn loc.resultHTML />
+	</cffunction>
+	
+	<cffunction name="pageShow" access="public" hint="Shows the specified element">
+		<cfargument name="selector" type="string" required="true" hint="The class or ID of the content you wish to show" />
+		
+		<cfset var loc = {}>
+		
+		<cfset loc.resultHTML = "$('#arguments.selector#').show();">
+		
+		<cfreturn loc.resultHTML />
+	</cffunction>
+	
 	<cffunction name="renderRemotePage" access="public" hint="Renders the specified remote view, it will append a '.js' value to the current action, or the value specified in the 'action' argument. So your filename should be [action].js.cfm">
 		<cfargument name="action" type="string" default="#params.action#" />
 		
