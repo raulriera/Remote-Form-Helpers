@@ -191,6 +191,57 @@
 		<cfreturn loc.returnValue>
 	</cffunction>
 
+	<cffunction name="remoteButtonTo" access="public" returnType="string" output="false"
+		hint="Creates an AJAX button to another page in your application.">
+		<cfargument name="text" type="string" required="false" hint="The text content of the button.">
+		<cfargument name="confirm" type="string" required="false" hint="See documentation for @linkTo.">
+		<cfargument name="image" type="string" required="false" hint="If you want to use an image for the button pass in the link to it here (relative from the `images` folder).">
+		<cfargument name="disable" type="any" required="false" hint="Pass in `true` if you want the button to be disabled when clicked (can help prevent multiple clicks), or pass in a string if you want the button disabled and the text on the button updated (to ""please wait..."", for example).">
+		<cfargument name="route" type="string" required="false" default="" hint="See documentation for @URLFor.">
+		<cfargument name="controller" type="string" required="false" default="" hint="See documentation for @URLFor.">
+		<cfargument name="action" type="string" required="false" default="" hint="See documentation for @URLFor.">
+		<cfargument name="key" type="any" required="false" default="" hint="See documentation for @URLFor.">
+		<cfargument name="params" type="string" required="false" default="" hint="See documentation for @URLFor.">
+		<cfargument name="anchor" type="string" required="false" default="" hint="See documentation for @URLFor.">
+		<cfargument name="onlyPath" type="boolean" required="false" hint="See documentation for @URLFor.">
+		<cfargument name="host" type="string" required="false" hint="See documentation for @URLFor.">
+		<cfargument name="protocol" type="string" required="false" hint="See documentation for @URLFor.">
+		<cfargument name="port" type="numeric" required="false" hint="See documentation for @URLFor.">		
+		<cfargument name="onSuccess" type="string" required="false" hint="Function to execute when the ajax request succeeds" />
+		<cfargument name="onError" type="string" required="false" hint="Function to execute when the ajax request fails" />
+		<cfargument name="onComplete" type="string" required="false" hint="Function to execute when the ajax request is complete (runs on error and success)" />
+		<cfargument name="onBeforeSend" type="string" required="false" hint="Function to execute before the ajax request is sent." />
+		
+		<cfscript>
+			var loc = {};
+			$insertDefaults(name="buttonTo", input=arguments);
+			
+			// sets a flag to indicate whether we use get or post on this form, used when obfuscating params
+			arguments.method = "post"
+			request.wheels.currentFormMethod = arguments.method;
+				
+			arguments.action = URLFor(argumentCollection=arguments);
+			arguments.action = Replace(arguments.action, "&", "&amp;", "all");
+			
+			if (Len(arguments.confirm))
+				arguments.onClick = "if (!confirm('#arguments.confirm#')) { return false; };" & arguments.onClick;
+				
+			loc.content = submitTag(value=arguments.text, image=arguments.image, disable=arguments.disable);
+			
+			loc.skip = "confirm,disable,image,route,controller,key,params,anchor,onlyPath,host,protocol,port,onSuccess,onError,onComplete,onBeforeSend,onClick";
+			if (Len(arguments.route))
+				loc.skip = ListAppend(loc.skip, $routeVariables(argumentCollection=arguments)); // variables passed in as route arguments should not be added to the html element
+			if (ListFind(loc.skip, "action"))
+				loc.skip = ListDeleteAt(loc.skip, ListFind(loc.skip, "action")); // need to re-add action here even if it was removed due to being a route variable above
+			
+			// Setup the onSubmit attribute
+			arguments.onSubmit = $ajaxSetup(argumentCollection=arguments);
+				
+			loc.returnValue = $element(name="form", skip=loc.skip, content=loc.content, attributes=arguments);
+		</cfscript>
+		<cfreturn loc.returnValue>
+	</cffunction>
+
 	<cffunction name="$ajaxSetup" access="public" returnType="string" output="false">
 
 		<cfset var loc = {}>
