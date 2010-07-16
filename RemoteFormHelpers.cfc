@@ -5,7 +5,7 @@
 		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="pageInsertHTML" access="public" hint="Inserts HTML content at the specified position and HTML element">
+	<cffunction name="pageInsertHTML" access="public" output="false" hint="Inserts HTML content at the specified position and HTML element">
 		<cfargument name="selector" type="string" required="true" hint="The class or ID of the content you wish to insert HTML into" />
 		<cfargument name="position" type="string" required="false" default="before" hint="Position to insert the content into" />
 		<cfargument name="content" type="string" required="false" hint="HTML to insert into" />
@@ -38,7 +38,7 @@
 		<cfreturn loc.resultHTML />
 	</cffunction>
 
-	<cffunction name="pageReplaceHTML" access="public" hint="Replace the HTML content of the specified element">
+	<cffunction name="pageReplaceHTML" access="public" output="false" hint="Replace the HTML content of the specified element">
 		<cfargument name="selector" type="string" required="true" hint="The class or ID of the content you wish to insert HTML into" />
 		<cfargument name="content" type="string" required="false" hint="HTML to replace with" />
 		<cfargument name="partial" type="string" required="false" hint="Partial file containing the HTML you wish to replace with" />
@@ -58,7 +58,7 @@
 		<cfreturn loc.resultHTML />
 	</cffunction>
 
-	<cffunction name="pageRemove" access="public" hint="Removes the specified element">
+	<cffunction name="pageRemove" access="public" output="false" hint="Removes the specified element">
 		<cfargument name="selector" type="string" required="true" hint="The class or ID of the content you wish to insert HTML into" />
 		<!---<cfargument name="options" type="string" required="false" hint="jQuery specific options to the apply to the remove function" />--->
 
@@ -69,17 +69,17 @@
 		<cfreturn loc.resultHTML />
 	</cffunction>
 
-	<cffunction name="pageHide" access="public" hint="Hides the specified element">
+	<cffunction name="pageHide" access="public" output="false" hint="Hides the specified element">
 		<cfargument name="selector" type="string" required="true" hint="The class or ID of the content you wish to hide" />
 
 		<cfset var loc = {}>
 
 		<cfset loc.resultHTML = "$('#arguments.selector#').hide();">
-
+		
 		<cfreturn loc.resultHTML />
 	</cffunction>
 
-	<cffunction name="pageShow" access="public" hint="Shows the specified element">
+	<cffunction name="pageShow" access="public" output="false" hint="Shows the specified element">
 		<cfargument name="selector" type="string" required="true" hint="The class or ID of the content you wish to show" />
 
 		<cfset var loc = {}>
@@ -89,7 +89,16 @@
 		<cfreturn loc.resultHTML />
 	</cffunction>
 
-	<cffunction name="renderRemotePage" access="public" hint="Renders the specified remote view, it will append a '.js' value to the current action, or the value specified in the 'action' argument. So your filename should be [action].js.cfm">
+	<cffunction name="pageRedirectTo" access="public" output="false" hint="Redirects the user to the desired location according to Wheels `urlFor` rules">
+		
+		<cfset var loc = {}>
+
+		<cfset loc.resultHTML = "window.location.replace('#URLFor(argumentCollection = arguments)#');">
+		
+		<cfreturn loc.resultHTML />
+	</cffunction>
+
+	<cffunction name="renderRemotePage" access="public" output="false" hint="Renders the specified remote view, it will append a '.js' value to the current action, or the value specified in the 'action' argument. So your filename should be [action].js.cfm">
 		<cfargument name="action" type="string" default="#params.action#" />
 
 		<!--- Render the page with no layout and with a suffix of "js" --->
