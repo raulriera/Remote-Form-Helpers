@@ -1,4 +1,11 @@
 # CHANGE LOG
+- Version 0.6:
+	- Support for `remoteButtonTo` (Thanks to Adam Michel)
+	- Support for `pageRedirectTo`
+	- Removed white space from the outputs of each function
+	- Improved documentation in the plugin's home.
+- Version 0.4:
+	- Support for Wheels 1.0.5 (Thanks to Joshua Clingenpeel)
 - Version 0.3:
 	- Support for Wheels 1.0.2.
 	- Support for `renderRemotePage`.
