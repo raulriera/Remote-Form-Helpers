@@ -226,7 +226,7 @@
 			$insertDefaults(name="buttonTo", input=arguments);
 			
 			// sets a flag to indicate whether we use get or post on this form, used when obfuscating params
-			arguments.method = "post"
+			arguments.method = "post";
 			request.wheels.currentFormMethod = arguments.method;
 				
 			arguments.action = URLFor(argumentCollection=arguments);
