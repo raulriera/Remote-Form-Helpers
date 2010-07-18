@@ -251,6 +251,27 @@
 		<cfreturn loc.returnValue>
 	</cffunction>
 
+	<cffunction name="renderAjax" hint="Renders either a partial or HTML content to a DOM object.">
+		<cfargument name="selector" required="true">
+		<cfargument name="content" required="false">
+		<cfargument name="partial" required="false">
+			
+		<cfcontent type="text/javascript">
+		<cfscript>
+			var loc = {};
+			var loc.content = "";
+			
+			if (structKeyExists(arguments, "content"))
+				loc.content = arguments.content;
+			else if (structKeyExists(arguments, "partial"))
+				loc.content = JSStringFormat(includePartial(arguments.partial));
+			
+			loc.resultHTML = "$('" & arguments['selector'] & "').html('" & loc.content & "');";
+			
+			renderText(loc.resultHTML);
+		</cfscript>
+	</cffunction>
+
 	<cffunction name="$ajaxSetup" access="public" returnType="string" output="false">
 
 		<cfset var loc = {}>
