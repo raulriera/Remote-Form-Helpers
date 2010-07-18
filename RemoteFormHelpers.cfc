@@ -223,6 +223,8 @@
 		
 		<cfscript>
 			var loc = {};
+			var loc.onClick = "";
+			
 			$insertDefaults(name="buttonTo", input=arguments);
 			
 			// sets a flag to indicate whether we use get or post on this form, used when obfuscating params
@@ -233,11 +235,11 @@
 			arguments.action = Replace(arguments.action, "&", "&amp;", "all");
 			
 			if (Len(arguments.confirm))
-				arguments.onClick = "if (!confirm('#arguments.confirm#')) { return false; };" & arguments.onClick;
+				loc.onClick = "return confirm('#arguments.confirm#')";
 				
-			loc.content = submitTag(value=arguments.text, image=arguments.image, disable=arguments.disable);
+			loc.content = submitTag(value=arguments.text, image=arguments.image, disable=arguments.disable,onClick=loc.onClick);
 			
-			loc.skip = "confirm,disable,image,route,controller,key,params,anchor,onlyPath,host,protocol,port,onSuccess,onError,onComplete,onBeforeSend,onClick";
+			loc.skip = "confirm,disable,image,route,controller,key,params,anchor,onlyPath,host,protocol,port,onSuccess,onError,onComplete,onBeforeSend";
 			if (Len(arguments.route))
 				loc.skip = ListAppend(loc.skip, $routeVariables(argumentCollection=arguments)); // variables passed in as route arguments should not be added to the html element
 			if (ListFind(loc.skip, "action"))
