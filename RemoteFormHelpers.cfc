@@ -264,9 +264,9 @@
 			if (structKeyExists(arguments, "content"))
 				loc.content = arguments.content;
 			else if (structKeyExists(arguments, "partial"))
-				loc.content = JSStringFormat(includePartial(arguments.partial));
+				loc.content = includePartial(arguments.partial);
 			
-			loc.resultHTML = "$('" & arguments['selector'] & "').html('" & loc.content & "');";
+			loc.resultHTML = "$('" & arguments['selector'] & "').html('" & JSStringFormat(loc.content) & "');";
 			
 			renderText(loc.resultHTML);
 		</cfscript>
