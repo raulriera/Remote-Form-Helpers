@@ -253,7 +253,7 @@
 		<cfreturn loc.returnValue>
 	</cffunction>
 
-	<cffunction name="renderAjax" hint="Renders either a partial or HTML content to a DOM object.">
+	<cffunction name="renderJavascript" hint="Renders either a partial or HTML content to a DOM object.">
 		<cfargument name="selector" required="true">
 		<cfargument name="content" required="false">
 		<cfargument name="partial" required="false">

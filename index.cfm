@@ -19,6 +19,7 @@
 
 <ul>
 	<li>renderRemotePage</li>
+	<li>renderJavascript</li>
 </ul>
 
 <p>The following functions, should be used inside your [action].js.cfm files.</p>

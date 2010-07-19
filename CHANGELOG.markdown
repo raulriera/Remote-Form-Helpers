@@ -1,7 +1,8 @@
 # CHANGE LOG
 - Version 0.7:
 	- Fixed for a missing semicolon
-	
+	- Fixed more issues with `remoteButtonTo`
+	- Added `renderJavascript` (Thanks to Adam Michel)
 - Version 0.6:
 	- Support for `remoteButtonTo` (Thanks to Adam Michel)
 	- Support for `pageRedirectTo`
