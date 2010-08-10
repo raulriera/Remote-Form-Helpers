@@ -1,4 +1,7 @@
 # CHANGE LOG
+- Version 0.7.1:
+	- Added `javascriptFlash`.
+	- Reworked `renderJavascript` to make use of `javascriptFlash`.
 - Version 0.7:
 	- Fixed for a missing semicolon
 	- Fixed more issues with `remoteButtonTo`

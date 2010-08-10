@@ -254,26 +254,52 @@
 	</cffunction>
 
 	<cffunction name="renderJavascript" hint="Renders either a partial or HTML content to a DOM object.">
-		<cfargument name="selector" required="true">
-		<cfargument name="content" required="false">
-		<cfargument name="partial" required="false">
+		<cfargument name="selector" type="string" required="true">
+		<cfargument name="content" type="string" required="false">
+		<cfargument name="partial" type="string" required="false">
+		<cfargument name="includeFlash" type="boolean" required="false" default="true">
 			
 		<cfcontent type="text/javascript">
 		<cfscript>
 			var loc = {};
-			var loc.content = "";
+			var loc.returnJS = "";
 			
-			if (structKeyExists(arguments, "content"))
-				loc.content = arguments.content;
-			else if (structKeyExists(arguments, "partial"))
-				loc.content = includePartial(arguments.partial);
+			if (arguments.includeFlash)
+				loc.returnJS = javascriptFlash();
+				
+			loc.returnJS = loc.returnJS & '' & pageReplaceHTML(argumentCollection=arguments);
 			
-			loc.resultHTML = "$('" & arguments['selector'] & "').html('" & JSStringFormat(loc.content) & "');";
-			
-			renderText(loc.resultHTML);
+			renderText(loc.returnJS);
 		</cfscript>
 	</cffunction>
-
+	
+	<cffunction name="javascriptFlash" hint="Dynamically inserts a specified flash key into the DOM.">
+		<cfargument name="key" type="string" required="false">
+		<cfargument name="selector" type="string" required="false" default="##flash">
+		<cfargument name="reset" type="boolean" required="false" default="true" hint="If this is set to true, anything leftover in the flash div will be cleared.">
+		
+		<cfscript>
+			var loc = {};
+			var loc.returnJS = "";
+			
+			if (arguments.reset)
+				var loc.returnJS = pageReplaceHTML(selector=arguments.selector, content="");
+			
+			if (structKeyExists(arguments, "key")) {
+				loc.content = "<p class=""" & arguments.key & """>" & flash(arguments.key) & "</p>";
+				loc.returnJS = pageReplaceHTML(selector=arguments.selector, content=loc.content);
+			} else {
+				var loc.flashCollection = flash();
+				for (key in loc.flashCollection) {
+					var loc.flashElement = structFind(loc.flashCollection, key);
+					loc.content = "<p class=""" & LCase(key) & """>" & loc.flashElement &"</p>";
+					loc.returnJS = loc.returnJS & '' & pageInsertHTML(selector=arguments.selector, content=loc.content);
+				}
+			}
+		</cfscript>
+		<cfreturn loc.returnJS>
+	</cffunction>
+	
 	<cffunction name="$ajaxSetup" access="public" returnType="string" output="false">
 
 		<cfset var loc = {}>
