@@ -13,6 +13,8 @@
 	<li>pageShow</li>
 	<li>pageHide</li>
 	<li>pageRedirectTo</li>
+	<li>pageInsertFlash</li>
+	<li>pageVisualEffect</li>
 </ul>
 
 <p>The following functions, should be used inside your [action].js.cfm files.</p>

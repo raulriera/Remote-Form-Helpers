@@ -1,7 +1,10 @@
 # CHANGE LOG
-- Version 0.7.1:
-	- Added `javascriptFlash`.
-	- Reworked `renderJavascript` to make use of `javascriptFlash`.
+- Version 0.8:
+	- Support for Wheels 1.1.
+	- Added `pageVisualEffect` (requires jQuery's UI library)
+	- Fixed a problem with the callbacks, now you you can pass Javascript directly to it
+	- Added `pageInsertFlash` (Thanks to Adam Michel).
+	- Reworked `renderJavascript` to make use of `pageInsertFlash` (Thanks to Adam Michel).	
 - Version 0.7:
 	- Fixed for a missing semicolon
 	- Fixed more issues with `remoteButtonTo`

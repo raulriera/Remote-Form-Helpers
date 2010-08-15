@@ -1,8 +1,20 @@
 <cfcomponent output="false" mixin="controller">
 
 	<cffunction name="init">
-		<cfset this.version = "1.0.5,1.0.2,1.0.1,1.0">
+		<cfset this.version = "1.1">
 		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="pageVisualEffect" access="public" output="false" hint="Creates a visual effect at the specified selector (uses jQuery's UI library)">
+		<cfargument name="selector" type="string" required="true" hint="The class or ID of the content you wish to insert HTML into" />
+		<cfargument name="name" type="string" required="true" hint="The name of the effect to use, possible values are: 'blind', 'bounce', 'clip', 'drop', 'explode', 'fold', 'highlight', 'puff', 'pulsate', 'scale', 'shake', 'size', 'slide', 'transfer'" />
+		<cfargument name="duration" type="string" required="false" hint="A string representing one of the three predefined speeds ('slow', 'normal', or 'fast') or the number of milliseconds to run the animation (e.g. 1000)." />
+		
+		<cfset var loc = {}>
+				
+		<cfset loc.result = "$('#arguments.selector#').effect('#arguments.name#', '#arguments.duration#');">
+
+		<cfreturn loc.result />
 	</cffunction>
 
 	<cffunction name="pageInsertHTML" access="public" output="false" hint="Inserts HTML content at the specified position and HTML element">
@@ -125,7 +137,7 @@
 
 		<cfscript>
 			var loc = {};
-			$insertDefaults(name="startFormTag", input=arguments);
+			$args(name="startFormTag", args=arguments);
 
 			// sets a flag to indicate whether we use get or post on this form, used when obfuscating params
 			request.wheels.currentFormMethod = arguments.method;
@@ -176,7 +188,7 @@
 
 		<cfscript>
 			var loc = {};
-			$insertDefaults(name="linkTo", reserved="href", input=arguments);
+			$args(name="linkTo", reserved="href", args=arguments);
 
 			arguments.href = URLFor(argumentCollection=arguments);
 			arguments.href = Replace(arguments.href, "&", "&amp;", "all"); // make sure we return XHMTL compliant code
@@ -225,7 +237,7 @@
 			var loc = {};
 			var loc.onClick = "";
 			
-			$insertDefaults(name="buttonTo", input=arguments);
+			$args(name="buttonTo", args=arguments);
 			
 			// sets a flag to indicate whether we use get or post on this form, used when obfuscating params
 			arguments.method = "post";
@@ -265,7 +277,7 @@
 			var loc.returnJS = "";
 			
 			if (arguments.includeFlash)
-				loc.returnJS = javascriptFlash();
+				loc.returnJS = pageInsertFlash();
 				
 			loc.returnJS = loc.returnJS & '' & pageReplaceHTML(argumentCollection=arguments);
 			
@@ -273,9 +285,9 @@
 		</cfscript>
 	</cffunction>
 	
-	<cffunction name="javascriptFlash" hint="Dynamically inserts a specified flash key into the DOM.">
+	<cffunction name="pageInsertFlash" hint="Dynamically inserts a specified flash key into the DOM.">
 		<cfargument name="key" type="string" required="false">
-		<cfargument name="selector" type="string" required="false" default="##flash">
+		<cfargument name="selector" type="string" required="false" default=".flash-messages">
 		<cfargument name="reset" type="boolean" required="false" default="true" hint="If this is set to true, anything leftover in the flash div will be cleared.">
 		
 		<cfscript>
@@ -316,16 +328,16 @@
 
 		<!--- add only the passed in callbacks --->
 		<cfif StructKeyExists(arguments, "onSuccess")>
-			<cfset loc.returnValue = loc.returnValue & ", success: function(data, textStatus){#arguments.onSuccess#(data, textStatus);}">
+			<cfset loc.returnValue = loc.returnValue & ", success: function(data, textStatus){#arguments.onSuccess#}">
 		</cfif>
 		<cfif StructKeyExists(arguments, "onError")>
-			<cfset loc.returnValue = loc.returnValue & ", error: function(XMLHttpRequest, textStatus, errorThrown){#arguments.onError#(XMLHttpRequest, textStatus, errorThrown);}">
+			<cfset loc.returnValue = loc.returnValue & ", error: function(XMLHttpRequest, textStatus, errorThrown){#arguments.onError#}">
 		</cfif>
 		<cfif StructKeyExists(arguments, "onBeforeSend")>
-			<cfset loc.returnValue = loc.returnValue & ", beforeSend: function(XMLHttpRequest){#arguments.onBeforeSend#(XMLHttpRequest);}">
+			<cfset loc.returnValue = loc.returnValue & ", beforeSend: function(XMLHttpRequest){#arguments.onBeforeSend#}">
 		</cfif>
 		<cfif StructKeyExists(arguments, "onComplete")>
-			<cfset loc.returnValue = loc.returnValue & ", complete: function(XMLHttpRequest, textStatus){#arguments.onComplete#(XMLHttpRequest, textStatus);}">
+			<cfset loc.returnValue = loc.returnValue & ", complete: function(XMLHttpRequest, textStatus){#arguments.onComplete#}">
 		</cfif>
 
 		<!--- Close the line --->
