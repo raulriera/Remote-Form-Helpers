@@ -235,7 +235,7 @@
 		
 		<cfscript>
 			var loc = {};
-			var loc.onClick = "";
+			loc.onClick = "";
 			
 			$args(name="buttonTo", args=arguments);
 			
