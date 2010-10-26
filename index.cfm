@@ -17,14 +17,13 @@
 	<li>pageVisualEffect</li>
 </ul>
 
-<p>The following functions, should be used inside your [action].js.cfm files.</p>
+<p>The following functions, should be used inside your controller files.</p>
 
 <ul>
 	<li>renderRemotePage</li>
-	<li>renderJavascript</li>
 </ul>
 
-<p>The following functions, should be used inside your [action].js.cfm files.</p>
+<p>The following functions, should be used inside your normal view files.</p>
 
 <ul>
 	<li>startRemoteFormTag</li>
