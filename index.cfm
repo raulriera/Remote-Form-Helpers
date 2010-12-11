@@ -17,21 +17,6 @@
 	<li>pageVisualEffect</li>
 </ul>
 
-<p>The following functions, should be used inside your controller files.</p>
-
-<ul>
-	<li>renderRemotePage</li>
-</ul>
-
-<p>The following functions, should be used inside your normal view files.</p>
-
-<ul>
-	<li>startRemoteFormTag</li>
-	<li>endRemoteFormTag</li>
-	<li>remoteLinkTo</li>
-	<li>remoteButtonTo</li>
-</ul>
-
 <h2>Documentation</h2>
 
 <p>For a complete guide of the previous functions, documentation and sample codes, please visit the following link <a href="http://wiki.github.com/raulriera/Remote-Form-Helpers/">http://wiki.github.com/raulriera/Remote-Form-Helpers/</a></p>

@@ -1,4 +1,10 @@
 # CHANGE LOG
+- Version 0.9:
+	- Drops support for anything below 1.1
+	- Removes obstructive JavaScript from the output.
+	- Drops support for all remoteXXX functions, now reuses Wheels current methods and adds "remote=true" as an argument.
+	- Includes a "jQuery adapter" (can be switched easily to other framerworks)
+
 - Version 0.8:
 	- Support for Wheels 1.1.
 	- Added `pageVisualEffect` (requires jQuery's UI library)
