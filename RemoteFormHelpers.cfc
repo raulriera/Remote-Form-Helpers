@@ -299,4 +299,23 @@
 		<cfreturn loc.returnValue>
 	</cffunction>
 	
+	<cffunction name="$requestContentType" access="public" output="false" returntype="string">
+		<cfargument name="params" type="struct" required="false" default="#variables.params#" />
+		<cfargument name="httpAccept" type="string" required="false" default="#request.cgi.http_accept#" />
+		<cfscript>
+			var loc = {};
+			loc.format = "html";
+
+			// see if we have a format param
+			if (StructKeyExists(arguments.params, "format"))
+				return arguments.params.format;
+
+			for (loc.item in application.wheels.formats) {
+				if (arguments.httpAccept CONTAINS application.wheels.formats[loc.item])
+					return loc.item;
+			}
+		</cfscript>
+		<cfreturn loc.format />
+	</cffunction>
+	
 </cfcomponent>
